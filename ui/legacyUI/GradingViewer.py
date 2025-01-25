@@ -8,10 +8,9 @@ import os
 import json
 import time
 
-from idaapi import get_root_filename
+from idaapi import get_root_filename, ask_long
 
 from dynamic.TraceRepresentation import Traceline
-from idc import AskLong
 from ui.PluginViewer import PluginViewer
 from ui.UIManager import QtGui, QtCore
 
@@ -155,7 +154,7 @@ class GradingViewer(PluginViewer):
 
     @QtCore.Slot(str)
     def SetThreshold(self):
-        threshold = AskLong(-1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(self.grades), ''.join('%s ' % c for c in self.grades)))
+        threshold = ask_long(-1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(self.grades), ''.join('%s ' % c for c in self.grades)))
         if threshold in self.grades:
             self.PopulateModel(threshold)
 

@@ -12,14 +12,14 @@ if not use_qt5:
     from legacyUI.ClusterViewer import ClusterViewer
     from legacyUI.GradingViewer import GradingViewer
     from legacyUI.OptimizationViewer import OptimizationViewer
-    from legacyUI.VMInputOutputViewer import VMInputOuputViewer
+    from legacyUI.VMInputOutputViewer import VMInputOutputViewer
     from legacyUI.StackChangeViewer import StackChangeViewer
 else:
-    from ClusterViewer import ClusterViewer
-    from GradingViewer import GradingViewer
-    from OptimizationViewer import OptimizationViewer
-    from VMInputOutputViewer import VMInputOuputViewer
-    from StackChangeViewer import StackChangeViewer
+    import ui.ClusterViewer 
+    import ui.GradingViewer
+    import ui.OptimizationViewer
+    import ui.VMInputOutputViewer
+    import ui.StackChangeViewer 
 
 
 class UIManager(object):

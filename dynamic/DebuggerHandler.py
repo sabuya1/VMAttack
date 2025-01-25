@@ -11,12 +11,13 @@ from collections import defaultdict
 from copy import deepcopy
 from lib.Util import remove_all_colors
 from ui.UIManager import QtGui
-from IDADebugger import IDADebugger
+import types
 
 from idautils import *
 from idaapi import *
 from idc import *
-
+from ida_ida import *
+from ida_idaapi import *
 class DebuggerHandler(object):
     def __init__(self, func=None):
         self.dbg = None
@@ -58,7 +59,7 @@ class DebuggerHandler(object):
         self.dbg = self.load_dbg()
         self.dbg.hook_dbg()
 
-    def gen_instruction_trace(self, start=BeginEA(), end=BADADDR):
+    def gen_instruction_trace(self, start=inf_get_min_ea(), end=BADADDR):
         self._trace = Trace()
         if not self.check:
             self.dbg = self.load_dbg()
@@ -284,7 +285,7 @@ def load():
                 trace.ctx_reg_size = 32
             msg("[*] Trace Loaded!\n")
             return trace
-        except Exception, e:
+        except Exception as e:
             raise Exception('[*] Exception occured: \n%s\n' % (e.message))
     else:
         return None

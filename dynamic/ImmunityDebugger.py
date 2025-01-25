@@ -2,7 +2,7 @@
 __author__ = 'Anatoli Kalysch'
 
 
-from Debugger import Debugger
+from . import Debugger
 import sys
 
 # TODO this is a stub and will be completed later

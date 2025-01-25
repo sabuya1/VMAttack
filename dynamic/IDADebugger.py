@@ -5,15 +5,19 @@ from lib.VMRepresentation import get_vmr
 
 __author__ = 'Anatoli Kalysch'
 
-from Debugger import Debugger
+from . import Debugger
 from dynamic.TraceRepresentation import Trace, Traceline
 from idaapi import *
+from ida_ida import *
+from ida_idaapi import *
+import ida_dbg
 from lib.Util import *
-from _collections import defaultdict
+from collections import defaultdict
 from lib.Util import get_reg_class, get_reg
 
 
-class IDADebugger(DBG_Hooks, Debugger):
+
+class IDADebugger(Debugger):
     def __init__(self, *args):
         super(IDADebugger, self).__init__(*args)
         self.hooked = False
@@ -89,7 +93,7 @@ class IDADebugger(DBG_Hooks, Debugger):
             self.arch = get_arch_dynamic()
 
         except Exception as ex:
-            print "An Exception was encountered: %s" % ex.message
+            print(f"An Exception was encountered: {ex.message}")
 
     def get_new_color(self, current_color):
         """
@@ -108,7 +112,7 @@ class IDADebugger(DBG_Hooks, Debugger):
             return colors[0]
 
     # TODO IAT checks
-    def gen_trace(self, trace_start=BeginEA(), trace_end=BADADDR):
+    def gen_trace(self, trace_start=ida_ida.inf_get_min_ea(), trace_end=BADADDR):
         """
         Generate trace for the loaded binary.
         :param trace_start:
@@ -122,7 +126,7 @@ class IDADebugger(DBG_Hooks, Debugger):
         for i in heads:
             SetColor(i, CIC_ITEM, 0xFFFFFF)
         # start exec
-        RunTo(BeginEA())
+        RunTo(ida_ida.inf_get_min_ea())
         event = GetDebuggerEvent(WFNE_SUSP, -1)
         # enable tracing
         EnableTracing(TRACE_STEP, 1)
@@ -153,7 +157,7 @@ class IDADebugger(DBG_Hooks, Debugger):
         if vmr.extract_param:
             vmr.func_args = self.func_args
             for key in self.func_args.keys():
-                print 'Function %s call args:' % key, ''.join('%s, ' % arg for arg in self.func_args[key]).rstrip(', ')
+                print(f'Function %s call args:{key} {''.join('%s, ' % arg for arg in self.func_args[key]).rstrip(', ')}')
         return self.trace
 
     def unhook_dbg(self):
@@ -185,11 +189,12 @@ class IDADebugger(DBG_Hooks, Debugger):
         return 0
 
     def dbg_library_load(self, pid, tid, ea, name, base, size):
-        print "Library loaded: pid=%d tid=%d name=%s base=%x" % (pid, tid, name, base)
+        print(f"Library loaded: pid={pid} tid={tid} name={name} base={base}")
 
 
     def dbg_bpt(self, tid, ea):
-        # print "Break point at 0x%x pid=%d" % (ea, tid)
+        # print("Break point at 0x%x pid=%d" % (ea, tid))
+
         # self.tid = tid
         # return values:
         #   -1 - to display a breakpoint warning dialog
@@ -199,7 +204,7 @@ class IDADebugger(DBG_Hooks, Debugger):
         return 0
 
     def dbg_suspend_process(self):
-        # print "Process suspended"
+        print("Process suspended")
         pass
 
     def dbg_exception(self, pid, tid, ea, exc_code, exc_can_cont, exc_ea, exc_info):
@@ -257,8 +262,8 @@ class IDADebugger(DBG_Hooks, Debugger):
                             'df': self.convert(cpu.df)})
 
             self.trace.append(Traceline(thread_id=tid, addr=ea, disasm=self.disconv(GetDisasm(ea)), ctx=deepcopy(self.ctx)))
-        except Exception, e:
-            print e.message
+        except Exception as e:
+            print(e.message)
         # return values:
         #   1  - do not log this trace event;
         #   0  - log it

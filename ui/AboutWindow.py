@@ -25,8 +25,8 @@ class AboutWindow(QtWidgets.QDialog):
             author.move(0, version.height() + version.y())
             thanks = self.config_label(self.thanks, 12)
             thanks.move(0, author.height() + author.y())
-        except Exception, e:
-            print e.message
+        except Exception as e:
+            print(e.message)
 
         self.show()
 

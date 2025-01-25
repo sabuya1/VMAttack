@@ -1,7 +1,7 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-from UIManager import QtWidgets
+from ui.UIManager import QtWidgets
 
 class NotifyProgress(QtWidgets.QWidget):
     def __init__(self, name='current', *args, **kwargs):

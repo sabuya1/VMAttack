@@ -7,8 +7,8 @@ import ui.SettingsWindow as SettingsWindow
 from dynamic.dynamic_deobfuscate import *
 from lib.VMRepresentation import *
 from static.static_deobfuscate import *
-from ui.AboutWindow import AboutWindow
-from ui.UIManager import UIManager
+from ui import AboutWindow
+from ui import UIManager
 
 
 class VMAttack_Manager(object):
@@ -95,7 +95,7 @@ class VMAttack_Manager(object):
         self.update_vmr()
         if self._vmr.trace is not None:
             for line in self._vmr.trace:
-                print line.to_str_line()
+                print(line.to_str_line())
 
     def remove_colors(self):
         # reset color
@@ -134,7 +134,7 @@ class VMAttack_Manager(object):
 
             show_opti_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "Dynamic Trace Optimization", "", 0, optimization_analysis, None)
             analyze_addr_trace_menu_item = add_menu_item(menu_path + 'Automated Analysis/Semi Automated (dynamic)/', "Clustering Analysis", "", 0, clustering_analysis, None)
-            show_input_output = add_menu_item(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "VM Input<=>Ouput Analysis", "", 0, input_output_analysis, None)
+            show_input_output = add_menu_item(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "VM Input<=>Output Analysis", "", 0, input_output_analysis, None)
 
             deobfuscate_from_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (static)/", "Static deobfuscate", "", 0, static_deobfuscate, None)
             show_abstract_graph_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (static)/", "Create Abstract VM-Graph", "", 0, static_deobfuscate, (2,))
@@ -150,7 +150,7 @@ class VMAttack_Manager(object):
             find_vmfunc_input = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Input Parameter", "", 0, manual_analysis, (1,))
             find_vmfunc_output = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Output Parameter", "", 0, manual_analysis, (0,))
             analyze_count_menu_item = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Address Count", "", 0, address_heuristic, None)
-            #manual_input_output = add_menu_item(menu_path + "Manual Analysis/Dynamic/", " Run Input<=>Ouput Analysis on Function", "", 0, input_output_analysis, (True,))
+            #manual_input_output = add_menu_item(menu_path + "Manual Analysis/Dynamic/", " Run Input<=>Output Analysis on Function", "", 0, input_output_analysis, (True,))
 
 
             self.menu_extensions.append(deobfuscate_from_menu_item)
@@ -179,8 +179,9 @@ class VMAttack_Manager(object):
             self.menu_extensions.append(remove_colors_menu_item)
 
 
-        except Exception, e:
-            print "[*] Menu could not be added! Following Error occurred:\n %s" % e.message
+        except Exception as e:
+            print("[*] Menu could not be added! Following Error occurred:\n %s" % e.message)
+
 
     def revert_menu(self):
         for i in self.menu_extensions:
@@ -223,7 +224,7 @@ class VMAttack_Manager(object):
         trace = prepare_trace()
         self.reset_grade(trace)
         # load current IDA-Debugger
-        if self.dbg_handl.dbg.module_name is "NoDbg":
+        if self.dbg_handl.dbg.module_name == "NoDbg":
             self.dbg_handl = self.select_debugger()
 
         # instruction trace
@@ -239,12 +240,12 @@ class VMAttack_Manager(object):
         try:
             self.update_vmr()
             deobfuscate(self._vmr.code_start, self._vmr.base_addr, self._vmr.code_end, self._vmr.vm_addr)
-        except Exception, e:
+        except Exception as e:
             try:
                 static_vmctx()
                 self.update_vmr()
                 deobfuscate(self._vmr.code_start, self._vmr.base_addr, self._vmr.code_end, self._vmr.vm_addr)
-            except Exception, ex:
+            except Exception as ex:
                 msg("[*] Could not provide static deobfuscation analysis! The following errors occured:\n %s \n %s" % (
                 e.message, ex.message))
 
@@ -253,23 +254,27 @@ class VMAttack_Manager(object):
         # input / output
         try:
             input_output_analysis()
-        except Exception, e:
-            print '[*] Exception occured while running Input/Output analysis!\n %s' % e.message
+        except Exception as e:
+            print("[*] Exception occured while running Input/Output analysis!\n %s" % e.message)
+
         # clustering
         try:
             clustering_analysis()
-        except Exception, e:
-            print '[*] Exception occured while running Clustering analysis!\n %s' % e.message
+        except Exception as e:
+            print("[*] Exception occured while running Clustering analysis!\n %s" % e.message)
+
         # optimizations
         try:
             optimization_analysis()
-        except Exception, e:
-            print '[*] Exception occured while running optimization analysis!\n %s' % e.message
+        except Exception as e:
+            print("[*] Exception occured while running optimization analysis!\n %s" % e.message)
+
         # grade the trace line
         try:
             grading_automaton()
-        except Exception, e:
-            print '[*] Exception occured while running grading analysis!\n %s' % e.message
+        except Exception as e:
+            print("[*] Exception occured while running grading analysis!\n %s" % e.message)
+
 
 
 # Virtualization obfuscated interpretation
@@ -290,7 +295,7 @@ class VMAttack(plugin_t):
             get_log().log('[VMA] Starting VMAttack and initiating variables ...\n')
             return PLUGIN_KEEP
 
-        except Exception, e:
+        except Exception as e:
             msg("[*] Failed to initialize VMAttack.\n %s\n" % e.message)
             if self.vma_mgr is not None:
                 self.vma_mgr.revert_menu()
@@ -304,7 +309,7 @@ class VMAttack(plugin_t):
             #self.vma_mgr.welcome()
             msg('[*] Reloading VMAttack plugin...\n')
             add_menu_item('Edit/Plugins/', 'Load VMAttack', None, 0, self.vma_mgr.extend_menu, ())
-        except Exception,e:
+        except Exception as e:
             msg("[*] Failed to initialize VMAttack.\n %s\n" % e.message)
             msg(e.args)
 

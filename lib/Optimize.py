@@ -37,10 +37,12 @@ def find_last_inst(pp_lst, start_pos, op):
     while pos != 0:
         inst = pp_lst[pos]
         if inst.inst_type == PI.POP_T and inst.op_lst[0] == op:
-            #print 'pop', op
+            #print("pop", op)
+
             return pos
         if inst.inst_class == PI.ASSIGNEMENT_T and op in inst.op_lst:
-            #print 'assignement', op
+            #print("assignement", op)
+
             return pos
         pos -= 1
     return None
@@ -55,7 +57,7 @@ def start_rec(pp_lst, jmp_pos):
     """
     jmp_inst = pp_lst[jmp_pos]
     if jmp_inst.list_len == 0:
-        print 'could not find jmp address'
+        print("could not find jmp address")        
         return []
     jmp_op = jmp_inst.op_lst[0]
     pos_lst = rec_find_addr(pp_lst, jmp_pos, jmp_op, 20)
@@ -122,7 +124,7 @@ def get_jmp_addresses(pp_lst, code_eaddr):
     for jpos in jp_lst:
         poss_adr_pos += start_rec(pp_lst, jpos)
     if len(poss_adr_pos) == 0:
-        print 'could not find addresses'
+        print("could not find addresses")        
         return []
     addrs = []
     for pos, jaddr in poss_adr_pos:
@@ -188,7 +190,8 @@ def find_basic_blocks(pp_lst, start_addr, jmp_addrs):
     del leader_lst
     del rel_addrs
     #for x, y in basic_blocks:
-    #    print 'BasicBlock From: {0:#x}'.format(x), ' To: {0:#x}'.format(y)
+    #    print("BasicBlock From: {0:#x}'.format(x), ' To: {0:#x}".format(y))
+
     if basic_blocks == []:
         return None
     return basic_blocks
@@ -845,8 +848,7 @@ def delete_overwrote_st(ps_lst):
 #    last_pos = len(ps_lst) - 1
 #    while pos <= last_pos:
 #        if (ps_lst[pos].drop):
-#            #print 'hallo'
-#            pos += 1
+#            #print("hallo")#            pos += 1
 #            continue
 #        for op_pos, r_op in enumerate(ps_lst[pos].op_lst):
 #            if r_op.name == op.name:
@@ -868,4 +870,4 @@ def delete_overwrote_st(ps_lst):
 #                if not item.drop:
 #                    item.drop = True
 #                    change = True
-#        print change
+#        print(change)

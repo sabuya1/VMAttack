@@ -1,7 +1,7 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-from _collections import deque
+from collections import deque
 from copy import deepcopy
 
 from dynamic.TraceRepresentation import Traceline, Trace

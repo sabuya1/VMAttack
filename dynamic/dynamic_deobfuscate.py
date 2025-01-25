@@ -4,44 +4,40 @@ __author__ = 'Anatoli Kalysch'
 
 from threading import Thread
 
-from ui.UIManager import GradingViewer
-from ui.UIManager import OptimizationViewer
-from ui.UIManager import StackChangeViewer
-from ui.UIManager import VMInputOuputViewer
+import ui.UIManager
 
-from DebuggerHandler import load, save, get_dh
+from .DebuggerHandler import load, save, get_dh
 from lib.TraceAnalysis import *
 from lib.VMRepresentation import get_vmr
 from ui.NotifyProgress import NotifyProgress
-from ui.UIManager import ClusterViewer
-
+from ui import ClusterViewer
+from . import IDADebugger
 
 ### DEBUGGER LOADING STRATEGIES ###
 # IDA Debugger
 def load_idadbg(self):
-    from IDADebugger import IDADebugger
     return IDADebugger()
 
 # OllyDbg
 def load_olly(self):
-    from OllyDebugger import OllyDebugger
+    from . import OllyDebugger
     return OllyDebugger()
 
 # Bochs Dbg
 def load_bochsdbg(self):
-    from IDADebugger import IDADebugger
+    from . import IDADebugger
     LoadDebugger('Bochs', 0)
     return IDADebugger()
 
 # Win32 Dbg
 def load_win32dbg(self):
-    from IDADebugger import IDADebugger
+    from . import IDADebugger
     LoadDebugger('win32', 0)
     return IDADebugger()
 
 # Immunity Dbg
 def load_immunitydbg(self):
-    from IDADebugger import IDADebugger
+    from . import IDADebugger
     return IDADebugger()
 
 
@@ -66,7 +62,10 @@ def prepare_vm_operands():
     return deepcopy(vmr.vm_operands)
 
 def load_dbg(choice):
-    dbg_handl = get_dh(available_debuggers[choice])
+    if choice is not None:
+        dbg_handl = get_dh(available_debuggers[choice])
+    else:
+        dbg_handl = get_dh(available_debuggers[0])
     if dbg_handl.check:
         return dbg_handl
     else:
@@ -125,9 +124,11 @@ def address_heuristic():
         w.close()
 
         for addr, count in ac:
-            print 'Address %x (Disasm: %s) was encountered %s times.' % (addr, GetDisasm(addr), count)
+            print("Address %x (Disasm: %s) was encountered %s times." % (addr, GetDisasm(addr), count))
+
     except:
-        print '[*] An exception occurred! Quitting! '
+        print("[*] An exception occurred! Quitting! ")
+
         w.close()
 
 # analysis functions supporting manual flag
@@ -191,7 +192,7 @@ def input_output_analysis(manual=False):
             w.pbar_update(10)
 
             w.close()
-            v = VMInputOuputViewer(input.get_result(), output.get_result(), ctx)
+            v = ui.UIManager.VMInputOutputViewer(input.get_result(), output.get_result(), ctx)
             v.Show()
     except:
         w.close()
@@ -241,7 +242,7 @@ def clustering_analysis(visualization=0, grade=False, trace=None):
             sorted_result = sorted(stack_changes.keys())
             sorted_result.reverse()
             w.close()
-            v1 = StackChangeViewer(vr, sorted_result, stack_changes)
+            v1 = ui.UIManager.StackChangeViewer(vr, sorted_result, stack_changes)
             v1.Show()
         else:
             w.close()
@@ -254,7 +255,7 @@ def optimization_analysis():
     Opens the Optimization Viewer to let the user dynamically interact with the trace.
     """
     trace = prepare_trace()
-    v = OptimizationViewer(trace, save=save)
+    v = ui.UIManager.OptimizationViewer(trace, save=save)
     v.Show()
 
 def dynamic_vmctx(manual=False):
@@ -267,7 +268,8 @@ def dynamic_vmctx(manual=False):
     vmr = get_vmr()
     vmr.vm_ctx = vm_ctx
     if manual:
-        print 'Code Start: %x; Code End: %x; Base Addr: %x; VM Addr: %x' % (vm_ctx.code_start, vm_ctx.code_end, vm_ctx.base_addr, vm_ctx.vm_addr)
+        print("Code Start: %x; Code End: %x; Base Addr: %x; VM Addr: %x" % (vm_ctx.code_start, vm_ctx.code_end, vm_ctx.base_addr, vm_ctx.vm_addr))
+
 
 def init_grading(trace):
     """
@@ -370,7 +372,8 @@ def grading_automaton(visualization=0):
                                 if line == other:
                                     other.raise_grade(vmr.in_out)
                         except ValueError:
-                            print 'The line %s was not found in the trace, hence the grade could not be raised properly!' % line.to_str_line()
+                            print("The line %s was not found in the trace, hence the grade could not be raised properly!" % line.to_str_line())
+
                 elif get_reg_class(key) in disregard_regs:
                     for line in follow_virt_reg(deepcopy(trace), virt_reg_addr=virt_regs[key]):
                         try:
@@ -378,7 +381,8 @@ def grading_automaton(visualization=0):
                                 if line == other:
                                     other.lower_grade(vmr.in_out)
                         except ValueError:
-                            print 'The line %s was not found in the trace, hence the grade could not be lowered properly!' % line.to_str_line()
+                            print("The line %s was not found in the trace, hence the grade could not be lowered properly!" % line.to_str_line())
+
         except:
             pass
         w.pbar_update(5) #45%
@@ -465,7 +469,7 @@ def grading_automaton(visualization=0):
         # TODO atm this is a little workaround to include the static analysis results
         try:
             comments = set(v_inst.split(' ')[0] for v_inst in [Comment(ea) for ea in range(vmr.code_start, vmr.code_end)] if v_inst is not None)
-            print comments
+            print(comments)
             ins = [c.lstrip('v').split('_')[0] for c in comments]
             for line in trace:
                 if line.disasm[0] in ins:
@@ -501,15 +505,15 @@ def grading_automaton(visualization=0):
 
 
         if visualization == 0:
-            v = GradingViewer(trace, save=save)
+            v = ui.UIManager.GradingViewer(trace, save=save)
             v.Show()
         else:
-            threshold = AskLong(1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(grades), ''.join('%s ' % c for c in grades)))
+            threshold = ask_long(1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(grades), ''.join('%s ' % c for c in grades)))
             if threshold > -1:
                 for line in trace:
                     if line.grade >= threshold:
-                        print line.grade, line.to_str_line()
+                        print(line.grade, line.to_str_line())
 
-    except Exception, e:
+    except Exception as e:
         w.close()
         msg(e.message + '\n')

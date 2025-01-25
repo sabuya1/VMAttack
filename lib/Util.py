@@ -4,6 +4,7 @@ __author__ = 'Anatoli Kalysch'
 import idaapi
 
 from idc import *
+import ida_ida
 from idautils import *
 from lib.Register import get_reg_class, get_reg_by_size
 
@@ -94,7 +95,7 @@ palette = [0xccccff, 0xb3b3ff, 0x9999ff, 0x8080ff, 0x6666ff, 0x4d4dff, 0x3333ff,
 
 
 def remove_all_colors():
-    heads = Heads(BeginEA(), BADADDR)
+    heads = Heads(ida_ida.inf_get_min_ea(), BADADDR)
     for head in heads:
         SetColor(head, CIC_ITEM, 0xFFFFFF)
 

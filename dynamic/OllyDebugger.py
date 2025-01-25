@@ -1,7 +1,7 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-from Debugger import Debugger
+from . import Debugger
 import sys
 from ollyapi import *
 

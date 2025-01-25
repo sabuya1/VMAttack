@@ -6,15 +6,14 @@ import re
 
 from copy import deepcopy
 from ui.NotifyProgress import NotifyProgress
-from _collections import defaultdict, deque
+from collections import defaultdict, deque
 from lib.VMRepresentation import get_vmr
 from dynamic.TraceRepresentation import Traceline
 from ui.PluginViewer import PluginViewer
 from ui.UIManager import QtGui, QtCore
 from lib.TraceAnalysis import cluster_removal
 
-from idaapi import is_basic_block_end
-from idc import AskLong
+from idaapi import is_basic_block_end, ask_long
 
 
 ###########################
@@ -158,7 +157,7 @@ class ClusterViewer(PluginViewer):
 
         # fetch the clicked string
         s = index.data(0)
-        print s
+        print(s)
         line_index = []
         inner_cluster_index = []
         if s.startswith('Cluster'):
@@ -229,8 +228,7 @@ class ClusterViewer(PluginViewer):
             menu.addAction(action_remove)
             menu.addSeparator()
         except:
-            print '[*] An Exception occured, remove action could not be added to the menu!'
-        # Actions
+            print("[*] An Exception occured, remove action could not be added to the menu!")        # Actions
         action_remove_threshold = QtGui.QAction('Remove several clusters...', self.treeView, triggered=lambda: self.ClusterRemoval())
 
         action_undo = QtGui.QAction('Undo', self.treeView, triggered=lambda: self.Undo())
@@ -251,7 +249,7 @@ class ClusterViewer(PluginViewer):
 
     @QtCore.Slot(str)
     def ClusterRemoval(self):
-        threshold = AskLong(1, 'How many most common clusters do you want removed?')
+        threshold = ask_long(1, 'How many most common clusters do you want removed?')
         self.undo_stack.append(deepcopy(self.trace))
         self.trace = cluster_removal(deepcopy(self.trace), threshold=threshold)
         self.PopulateModel()

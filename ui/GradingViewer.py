@@ -4,7 +4,7 @@ from ui.NotifyProgress import NotifyProgress
 __author__ = 'Anatoli Kalysch'
 
 from dynamic.TraceRepresentation import Traceline
-from idc import AskLong
+from idaapi import ask_long
 from ui.PluginViewer import PluginViewer
 from ui.UIManager import QtGui, QtCore, QtWidgets
 # from PyQt5 import QtGui, QtCore, QtWidgets
@@ -152,7 +152,7 @@ class GradingViewer(PluginViewer):
 
     @QtCore.pyqtSlot(str)
     def SetThreshold(self):
-        threshold = AskLong(-1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(self.grades), ''.join('%s ' % c for c in self.grades)))
+        threshold = ask_long(-1, 'There are a total of %s grades: %s. Specify a threshold which lines to display:' % (len(self.grades), ''.join('%s ' % c for c in self.grades)))
         if threshold in self.grades:
             self.PopulateModel(threshold)
 

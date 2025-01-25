@@ -1,15 +1,30 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-import imp
+import importlib.util
 import sys
 import os
 
 
-F_DIR = os.environ["VMAttack"]
+# F_DIR = os.environ["VMAttack"]
+F_DIR = r"C:\Users\Dell\quickscripts\VMAttack"
 F_NAME = "VMAttack.py"
 sys.path.append(F_DIR)
 
+
+def load_source(modname, filename):
+    loader = importlib.machinery.SourceFileLoader(modname, filename)
+    spec = importlib.util.spec_from_file_location(modname, filename, loader=loader)
+    module = importlib.util.module_from_spec(spec)
+    # The module is always executed and not cached in sys.modules.
+    # Uncomment the following line to cache the module.
+    sys.modules[module.__name__] = module
+    loader.exec_module(module)
+    return module
+
 plugin_path = os.path.join(F_DIR, F_NAME)
-plugin = imp.load_source(__name__, plugin_path)
+plugin = load_source(__name__, plugin_path)
+
+print(dir(plugin))
+
 PLUGIN_ENTRY = plugin.PLUGIN_ENTRY

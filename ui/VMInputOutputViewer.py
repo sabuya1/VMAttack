@@ -12,10 +12,10 @@ from ui.UIManager import QtGui, QtCore, QtWidgets
 #############################
 ### INPUT OUTPUT ANALYSIS ###
 #############################
-class VMInputOuputViewer(PluginViewer):
+class VMInputOutputViewer(PluginViewer):
     def __init__(self, input_set, output_set, output_ctx, title='Input/Output Analysis'):
         # context should be a dictionary containing the backward traced result of each relevant register
-        super(VMInputOuputViewer, self).__init__(title)
+        super(VMInputOutputViewer, self).__init__(title)
         self.input = input_set
         self.output = output_set
         self.ctx = output_ctx

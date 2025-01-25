@@ -178,8 +178,7 @@ class ScratchOperand(Operand):
         self.own_value = None
 
     # def __del__(self):
-    #    print 'del Sop'
-
+    #    print("del Sop")
 
     def __str__(self):
         # if not self.sc_ident:
@@ -202,7 +201,8 @@ class ScratchOperand(Operand):
     def value(self, sval):
         # recursion untill threse a 'value' found
         if (sval.type == SVARIABLE_T):
-            # print '........SVT:' + str(self)
+            # print("........SVT:" + str(self))
+
             self.own_value = sval.value
         else:
             self.own_value = sval
@@ -313,8 +313,7 @@ class PseudoOperand(Operand):
             # self.name = '&' + self.name
 
     # def __del__(self):
-    #    print 'op del'
-
+    #    print("op del")
 
     def __str__(self):
         if self.type == POINTER_T:
@@ -557,7 +556,8 @@ class PseudoInstruction(object):
             flagsop = VariableOperand(VARIABLE_T, self.size, True)
             assign_op2 = VariableOperand(VARIABLE_T, self.size)
             double_assign = DoubleVariable(assign_op2, assign_op)
-            # print 'POP PUSH REP::::::', self.size
+            # print("POP PUSH REP::::::", self.size)
+
             assign_instruction = PseudoInstruction(
                 self.mnem, self.addr,
                 [double_assign, op0, op1],

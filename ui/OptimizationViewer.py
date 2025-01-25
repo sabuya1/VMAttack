@@ -1,7 +1,7 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-from _collections import deque
+from collections import deque
 from copy import deepcopy
 
 from dynamic.TraceRepresentation import Traceline, Trace
@@ -9,9 +9,9 @@ from lib.Register import get_reg_by_size
 from lib.TraceAnalysis import repetition_clustering, find_virtual_regs, create_bb_diff
 from lib.TraceOptimizations import optimizations, optimization_names, optimization_selective_register_folding
 from ui.NotifyProgress import NotifyProgress
-from ui.PluginViewer import PluginViewer
+from .PluginViewer import PluginViewer
 from ui.UIManager import QtGui, QtCore, QtWidgets
-from ui.UIManager import ClusterViewer
+from ui import ClusterViewer
 # from PyQt5 import QtGui, QtCore, QtWidgets
 
 

@@ -122,7 +122,7 @@ class BBGraph(GraphViewer):
         self.func_addr = func_addr
         for inst in bb_lst:
             if isinstance(inst, Instruction):
-                print inst.__str__()
+                print(inst.__str__())
 
     def OnRefresh(self):
         self.Clear()
