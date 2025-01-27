@@ -129,7 +129,7 @@ def repetition_cluster_round(cluster_list):
                             elif isinstance(addition, list):
                                 cluster_list[ind - pop_ctr].extend(addition)
             except Exception as e:
-                print(e.message)
+                print(e)
                 pass
 
     # clean up clusterlist
@@ -225,7 +225,7 @@ def extract_stack_change(line, stack_changes):
             else:
                 stack_changes[addr] = value
         except Exception as e:
-            print(e.message)
+            print(e)
             print(e.args)
 
     return line, stack_changes
@@ -413,7 +413,7 @@ def dynamic_vm_values(trace, code_start=BADADDR, code_end=BADADDR, silent=False)
                         if len(arg) == 1:
                             code_addrs.append(int(arg[0], 16))
                     except Exception as e:
-                        print(e.message)
+                        print(e)
 
     # finalize base_addr
     max_addr = int(max(base_addr, key=base_addr.get), 16)  # now we have the base_addr used for offset computation - this will probably be the top of the table but to be sure we need to take its relative position into account
@@ -517,7 +517,7 @@ def find_ops_callconv(trace, vmp_seg_start, vmp_seg_end):
                                     elem = op1.split(expr)
 
                                     for e in elem:
-                                        if get_reg_class(e) is 7:  # 7 is the esp class
+                                        if get_reg_class(e) == 7:  # 7 is the esp class
                                             if get_reg_class(op2) is not None:  # mov [*xsp*], reg
                                                 ops.append(line.ctx[get_reg(op2, trace.ctx_reg_size)])
                                             else:  # mov [*xsp*], const
@@ -525,7 +525,7 @@ def find_ops_callconv(trace, vmp_seg_start, vmp_seg_end):
                                             break
                                 except:
                                     # mov [xsp]/[mem], reg/const
-                                    if get_reg_class(op1) is 7 or get_reg_class(op1) is None:  # 7 is the esp class
+                                    if get_reg_class(op1) == 7 or get_reg_class(op1) is None:  # 7 is the esp class
                                         if get_reg_class(op2) is not None:  # mov [xsp], reg
                                             ops.append(line.ctx[get_reg(op2, trace.ctx_reg_size)])
                                         else:  # mov [xsp], const
@@ -715,7 +715,7 @@ def follow_virt_reg(trace, **kwargs):
 
         except Exception as e:
             pass
-            #print("reg_vals\n",line, e.message)
+            #print("reg_vals\n",line, e)
 
         if watch_addrs:
             for addr in watch_addrs.copy():
@@ -736,7 +736,7 @@ def follow_virt_reg(trace, **kwargs):
                         if line.is_mov:
                             watch_addrs.remove(addr)
                 except Exception as e:
-                    #print("watch_addr\n",line, e.message)
+                    #print("watch_addr\n",line, e)
 
                     pass
 

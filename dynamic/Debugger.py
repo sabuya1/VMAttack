@@ -39,4 +39,3 @@ class Debugger(object):
     def set_env_context(self, ctx):
         return self.error_msg
 
-print(type(Debugger))

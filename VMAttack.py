@@ -7,17 +7,19 @@ import ui.SettingsWindow as SettingsWindow
 from dynamic.dynamic_deobfuscate import *
 from lib.VMRepresentation import *
 from static.static_deobfuscate import *
+from ida_kernwin import *
 from ui import AboutWindow
 from ui import UIManager
 
 
-class VMAttack_Manager(object):
+class VMAttack_Manager(action_handler_t):
     def __init__(self):
+        action_handler_t.__init__(self)
         self.choice = None
         self._vmr = get_vmr()
 
         # UI Management
-        self.ui_mgr = UIManager()
+        self.ui_mgr = UIManager.UIManager()
         self.ui_mgr.get_init_menu()
         self.menu_name = "VMAttack"
         self.menu_extensions = []
@@ -116,41 +118,44 @@ class VMAttack_Manager(object):
             # debugger selection - will be added after plugin interaction with ollydbg and immunitydbg will be enabled - as of now no additional value is generated compared to the debugger selection in IDA itself so it is commented out
             # An alternative to the chooser would be to hook IDAs Debugger selection?
             #select_debugger_menu_item = add_menu_item(menu_path, "Select VMAttack Debugger", "", 0, self.select_debugger, None)
+
+            # add_menu_item(const char *menupath, const char *name, const char *hotkey, int flags, menu_item_callback_t *callback, void *ud);
+
             # credits & settings
-            settings_menu_item = add_menu_item(menu_path, "Settings", "", 0, self.show_settings, None)
-            about_menu_item = add_menu_item(menu_path, "About ...", "", 0, self.show_about, None)
+            settings_menu_item = register_and_attach_to_menu(menu_path, "Settings", "", 0, self.show_settings, None)
+            about_menu_item = register_and_attach_to_menu(menu_path, "About ...", "", 0, self.show_about, None)
             # instruction trace generation and handling
-            remove_colors_menu_item = add_menu_item(menu_path + "Instruction Trace/", "Remove Colors from Graph", "", 0, self.remove_colors, None)
-            load_trace_menu_item = add_menu_item(menu_path + "Instruction Trace/", "Load Trace", "", 0, load_trace, None)
-            save_trace_menu_item = add_menu_item(menu_path + "Instruction Trace/", "Save Trace", "", 0, save_trace, None)
-            gen_trace_menu_item = add_menu_item(menu_path + "Instruction Trace/", "Generate Trace", "", 0, gen_instruction_trace, (self.choice,))
-            show_trace_menu_item = add_menu_item(menu_path + "Instruction Trace/", "Show Trace", "", 0, self.show_trace, None)
+            remove_colors_menu_item = register_and_attach_to_menu(menu_path + "Instruction Trace/", "Remove Colors from Graph", "label", "", 0, self.remove_colors, None, 0)
+            load_trace_menu_item = register_and_attach_to_menu(menu_path + "Instruction Trace/", "Load Trace", "label", "", 0, load_trace, None, 0)
+            save_trace_menu_item = register_and_attach_to_menu(menu_path + "Instruction Trace/", "Save Trace", "label", "", 0, save_trace, None, 0)
+            gen_trace_menu_item = register_and_attach_to_menu(menu_path + "Instruction Trace/", "Generate Trace", "label", "", 0, gen_instruction_trace, (self.choice,), 0)
+            show_trace_menu_item = register_and_attach_to_menu(menu_path + "Instruction Trace/", "Show Trace", "label", "", 0, self.show_trace, None, 0)
 
 
 
             ### automation ###
-            grading_menu_item = add_menu_item(menu_path + 'Automated Analysis/', "Grading System Analysis", "", 0, grading_automaton, None)
-            automaton_menu_item = add_menu_item(menu_path + 'Automated Analysis/', "Run all analysis capabilities", "", 0, self.automaton, None)
+            grading_menu_item = register_and_attach_to_menu(menu_path + 'Automated Analysis/', "Grading System Analysis", "", "", 0, grading_automaton, None, 0)
+            automaton_menu_item = register_and_attach_to_menu(menu_path + 'Automated Analysis/', "Run all analysis capabilities", "", "", 0, self.automaton, None, 0)
 
-            show_opti_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "Dynamic Trace Optimization", "", 0, optimization_analysis, None)
-            analyze_addr_trace_menu_item = add_menu_item(menu_path + 'Automated Analysis/Semi Automated (dynamic)/', "Clustering Analysis", "", 0, clustering_analysis, None)
-            show_input_output = add_menu_item(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "VM Input<=>Output Analysis", "", 0, input_output_analysis, None)
+            show_opti_menu_item = register_and_attach_to_menu(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "Dynamic Trace Optimization", "label", "", 0, optimization_analysis, None, 0)
+            analyze_addr_trace_menu_item = register_and_attach_to_menu(menu_path + 'Automated Analysis/Semi Automated (dynamic)/', "Clustering Analysis", "", 0, clustering_analysis, None)
+            show_input_output = register_and_attach_to_menu(menu_path + "Automated Analysis/Semi Automated (dynamic)/", "VM Input<=>Output Analysis", "label", "", 0, input_output_analysis, None, 0)
 
-            deobfuscate_from_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (static)/", "Static deobfuscate", "", 0, static_deobfuscate, None)
-            show_abstract_graph_menu_item = add_menu_item(menu_path + "Automated Analysis/Semi Automated (static)/", "Create Abstract VM-Graph", "", 0, static_deobfuscate, (2,))
+            deobfuscate_from_menu_item = register_and_attach_to_menu(menu_path + "Automated Analysis/Semi Automated (static)/", "Static deobfuscate", "label", "", 0, static_deobfuscate, None, 0)
+            show_abstract_graph_menu_item = register_and_attach_to_menu(menu_path + "Automated Analysis/Semi Automated (static)/", "Create Abstract VM-Graph", "label", "", 0, static_deobfuscate, (2,), 0)
             ### manual analysis ###
             # vm context related
-            static_start_search_menu_item = add_menu_item(menu_path + "Manual Analysis/VM Context/", "Find VM Context (static)", "", 0, static_vmctx, (True,))
-            find_vm_values_menu_item = add_menu_item(menu_path + "Manual Analysis/VM Context/", "Find VM Context (dynamic)", "", 0, dynamic_vmctx, (True,))
+            static_start_search_menu_item = register_and_attach_to_menu(menu_path + "Manual Analysis/VM Context/", "Find VM Context (static)", "label", "", 0, static_vmctx, (True,), 0)
+            find_vm_values_menu_item = register_and_attach_to_menu(menu_path + "Manual Analysis/VM Context/", "Find VM Context (dynamic)", "label", "", 0, dynamic_vmctx, (True,), 0)
             # static analysis menu items
-            manual_static_menu_item = add_menu_item(menu_path + "Manual Analysis/Static/", "Deobfuscate from ...", "", 0, static_deobfuscate, (0,True))
+            manual_static_menu_item = register_and_attach_to_menu(menu_path + "Manual Analysis/Static/", "Deobfuscate from ...", "label", "", 0, static_deobfuscate, (0,True), 0)
             # dynamic analysis menu items
-            follow_virt_register = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Follow Virtual Register", "", 0, manual_analysis, (3,))
-            find_reg_mapping = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Find Virtual Reg to Reg mapping", "", 0, manual_analysis, (2,))
-            find_vmfunc_input = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Input Parameter", "", 0, manual_analysis, (1,))
-            find_vmfunc_output = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Output Parameter", "", 0, manual_analysis, (0,))
-            analyze_count_menu_item = add_menu_item(menu_path + "Manual Analysis/Dynamic/", "Address Count", "", 0, address_heuristic, None)
-            #manual_input_output = add_menu_item(menu_path + "Manual Analysis/Dynamic/", " Run Input<=>Output Analysis on Function", "", 0, input_output_analysis, (True,))
+            follow_virt_register = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", "Follow Virtual Register", "label", "", 0, manual_analysis, (3,), 0)
+            find_reg_mapping = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", "Find Virtual Reg to Reg mapping", "label", "", 0, manual_analysis, (2,), 0)
+            find_vmfunc_input = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Input Parameter", "label", "", 0, manual_analysis, (1,), 0)
+            find_vmfunc_output = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", "Find VM Function Output Parameter", "label", "", 0, manual_analysis, (0,), 0)
+            analyze_count_menu_item = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", "Address Count", "label", "", 0, address_heuristic, None, 0)
+            #manual_input_output = register_and_attach_to_menu(menu_path + "Manual Analysis/Dynamic/", " Run Input<=>Output Analysis on Function", "label", "", 0, input_output_analysis, (True,), 0)
 
 
             self.menu_extensions.append(deobfuscate_from_menu_item)
@@ -180,7 +185,7 @@ class VMAttack_Manager(object):
 
 
         except Exception as e:
-            print("[*] Menu could not be added! Following Error occurred:\n %s" % e.message)
+            print("[*] Menu could not be added! Following Error occurred:\n %s" % e)
 
 
     def revert_menu(self):
@@ -247,7 +252,7 @@ class VMAttack_Manager(object):
                 deobfuscate(self._vmr.code_start, self._vmr.base_addr, self._vmr.code_end, self._vmr.vm_addr)
             except Exception as ex:
                 msg("[*] Could not provide static deobfuscation analysis! The following errors occured:\n %s \n %s" % (
-                e.message, ex.message))
+                e, ex))
 
 
         # run the dynamic analysis capabilities of the plugin -> each analysis increases a special trace lines grade which will be evaluated at the end of the analysis
@@ -255,25 +260,25 @@ class VMAttack_Manager(object):
         try:
             input_output_analysis()
         except Exception as e:
-            print("[*] Exception occured while running Input/Output analysis!\n %s" % e.message)
+            print("[*] Exception occured while running Input/Output analysis!\n %s" % e)
 
         # clustering
         try:
             clustering_analysis()
         except Exception as e:
-            print("[*] Exception occured while running Clustering analysis!\n %s" % e.message)
+            print("[*] Exception occured while running Clustering analysis!\n %s" % e)
 
         # optimizations
         try:
             optimization_analysis()
         except Exception as e:
-            print("[*] Exception occured while running optimization analysis!\n %s" % e.message)
+            print("[*] Exception occured while running optimization analysis!\n %s" % e)
 
         # grade the trace line
         try:
             grading_automaton()
         except Exception as e:
-            print("[*] Exception occured while running grading analysis!\n %s" % e.message)
+            print("[*] Exception occured while running grading analysis!\n %s" % e)
 
 
 
@@ -296,7 +301,7 @@ class VMAttack(plugin_t):
             return PLUGIN_KEEP
 
         except Exception as e:
-            msg("[*] Failed to initialize VMAttack.\n %s\n" % e.message)
+            msg("[*] Failed to initialize VMAttack.\n %s\n" % e)
             if self.vma_mgr is not None:
                 self.vma_mgr.revert_menu()
                 del self.vma_mgr
@@ -308,10 +313,11 @@ class VMAttack(plugin_t):
             self.vma_mgr.extend_menu()
             #self.vma_mgr.welcome()
             msg('[*] Reloading VMAttack plugin...\n')
-            add_menu_item('Edit/Plugins/', 'Load VMAttack', None, 0, self.vma_mgr.extend_menu, ())
+            register_and_attach_to_menu('Edit/Plugins/', 'Load VMAttack', "", "", 0, self.vma_mgr.extend_menu, None, 0)
         except Exception as e:
-            msg("[*] Failed to initialize VMAttack.\n %s\n" % e.message)
-            msg(e.args)
+            msg("[*] Failed to initialize VMAttack.\n %s\n" % e)
+            if isinstance(e, str):
+                msg(e)
 
     def term(self):
         if self.vma_mgr is not None:

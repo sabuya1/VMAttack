@@ -7,6 +7,8 @@ __author__ = 'Anatoli Kalysch'
 
 from . import Debugger
 from dynamic.TraceRepresentation import Trace, Traceline
+from idautils import *
+from idc import *
 from idaapi import *
 from ida_ida import *
 from ida_idaapi import *
@@ -19,7 +21,8 @@ from lib.Util import get_reg_class, get_reg
 
 class IDADebugger(Debugger):
     def __init__(self, *args):
-        super(IDADebugger, self).__init__(*args)
+        super().__init__()
+        self.dbg_hooks = ida_dbg.DBG_Hooks()
         self.hooked = False
         self.trace = Trace()
         self._module_name = 'IDADbg'
@@ -93,7 +96,7 @@ class IDADebugger(Debugger):
             self.arch = get_arch_dynamic()
 
         except Exception as ex:
-            print(f"An Exception was encountered: {ex.message}")
+            print(f"An Exception was encountered: {ex}")
 
     def get_new_color(self, current_color):
         """
@@ -263,7 +266,7 @@ class IDADebugger(Debugger):
 
             self.trace.append(Traceline(thread_id=tid, addr=ea, disasm=self.disconv(GetDisasm(ea)), ctx=deepcopy(self.ctx)))
         except Exception as e:
-            print(e.message)
+            print(e)
         # return values:
         #   1  - do not log this trace event;
         #   0  - log it

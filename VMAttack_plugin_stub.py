@@ -6,8 +6,7 @@ import sys
 import os
 
 
-# F_DIR = os.environ["VMAttack"]
-F_DIR = r"C:\Users\Dell\quickscripts\VMAttack"
+F_DIR = os.environ["VMAttack"]
 F_NAME = "VMAttack.py"
 sys.path.append(F_DIR)
 
@@ -25,6 +24,6 @@ def load_source(modname, filename):
 plugin_path = os.path.join(F_DIR, F_NAME)
 plugin = load_source(__name__, plugin_path)
 
-print(dir(plugin))
+
 
 PLUGIN_ENTRY = plugin.PLUGIN_ENTRY

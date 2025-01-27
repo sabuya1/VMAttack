@@ -504,7 +504,7 @@ def deobfuscate(code_saddr,  base_addr, code_eaddr, vm_addr, display=4, real_sta
         try:
             g = show_graph(nodes, edges, opt_basic, jmp_addrs, basic_blocks, real_start)
         except Exception as e:
-            print(e.message)
+            print(e)
     if jmp_addrs != []:
         min_jmp = min(jmp_addrs)[0]
     else:
@@ -733,7 +733,7 @@ def static_vmctx(manual=False):
                 base_addr = int(re.findall(r'.*off_([0123456789abcdefABCDEF]*)\[.*\]', GetOpnd(base_addr, 0))[0], 16)
                 break
             except Exception as e:
-                print(e.message)
+                print(e)
                 print(e.args)
         else:
             base_addr = NextHead(base_addr)
@@ -770,7 +770,7 @@ def static_deobfuscate(display=0, userchoice=False):
             vm_ctx = static_vmctx()
             vmr.vm_ctx = vm_ctx
         except Exception as e:
-            print(e.message)
+            print(e)
             print(e.args)
     if userchoice:
         code_start = AskAddr(vmr.code_start, 'Choose start of byte code:')

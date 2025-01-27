@@ -30,10 +30,9 @@ def get_arch_dynamic():
     Determine the execution environments architecture.
     :return: 'x64' or 'x86' if arch could be determined, else None
     """
-    info = idaapi.get_inf_structure()
-    if info.is_64bit():
+    if ida_ida.inf_is_64bit():
         return 64
-    elif info.is_32bit():
+    elif ida_ida.inf_is_32bit_exactly():
         return 32
     else:
         env = idaapi.dbg_get_registers()

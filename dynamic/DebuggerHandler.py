@@ -286,7 +286,7 @@ def load():
             msg("[*] Trace Loaded!\n")
             return trace
         except Exception as e:
-            raise Exception('[*] Exception occured: \n%s\n' % (e.message))
+            raise Exception('[*] Exception occured: \n%s\n' % (e))
     else:
         return None
 

@@ -1,7 +1,7 @@
 # coding=utf-8
 __author__ = 'Anatoli Kalysch'
 
-from UIManager import QtCore, QtWidgets
+from ui.UIManager import QtCore, QtWidgets
 
 class AboutWindow(QtWidgets.QDialog):
     def __init__(self, *args, **kwargs):
@@ -26,7 +26,7 @@ class AboutWindow(QtWidgets.QDialog):
             thanks = self.config_label(self.thanks, 12)
             thanks.move(0, author.height() + author.y())
         except Exception as e:
-            print(e.message)
+            print(e)
 
         self.show()
 

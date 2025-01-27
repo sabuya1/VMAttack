@@ -3,6 +3,7 @@ __author__ = 'Anatoli Kalysch'
 
 
 import idaapi
+import ida_kernwin
 
 # to mitigate the migration from PySide(IDA SDK <= 6.8) to PyQt5(IDA SDK >= 6.9) this class will handle UI viewer element imports
 
@@ -34,11 +35,11 @@ class UIManager(object):
     # initial menu grab
     def get_init_menu(self):
         try:
-            self.widget = form_to_widget(idaapi.get_current_tform())
+            self.widget = form_to_widget(ida_kernwin.get_current_widget())
             if self.widget is None:
                 raise Exception()
         except:
-            self.widget = form_to_widget(idaapi.find_tform('Output window'))
+            self.widget = form_to_widget(ida_kernwin.find_widget('Output window'))
         self.window = self.widget.window()
         self.menu = self.window.findChild(QtWidgets.QMenuBar)
 
@@ -58,7 +59,7 @@ class UIManager(object):
 
     # remove all menus currently in dict
     def clear(self):
-        for menu in self.menu_dict.itervalues():
+        for menu in self.menu_dict.items():
             self.menu.removeAction(menu.menuAction())
         self.menu_dict = {}
 

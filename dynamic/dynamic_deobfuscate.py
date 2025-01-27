@@ -11,11 +11,12 @@ from lib.TraceAnalysis import *
 from lib.VMRepresentation import get_vmr
 from ui.NotifyProgress import NotifyProgress
 from ui import ClusterViewer
-from . import IDADebugger
+
 
 ### DEBUGGER LOADING STRATEGIES ###
 # IDA Debugger
 def load_idadbg(self):
+    from . import IDADebugger
     return IDADebugger()
 
 # OllyDbg
@@ -37,7 +38,7 @@ def load_win32dbg(self):
 
 # Immunity Dbg
 def load_immunitydbg(self):
-    from . import IDADebugger
+    from . import ImmunityDebugger
     return IDADebugger()
 
 
@@ -516,4 +517,4 @@ def grading_automaton(visualization=0):
 
     except Exception as e:
         w.close()
-        msg(e.message + '\n')
+        msg(e + '\n')

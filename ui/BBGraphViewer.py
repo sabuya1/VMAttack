@@ -3,6 +3,7 @@ __author__ = 'Anatoli Kalysch'
 
 from idaapi import *
 from idc import *
+from ida_kernwin import *
 from lib.Instruction import Instruction
 
 
